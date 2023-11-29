@@ -13,3 +13,5 @@ def create_item(db: Session, name: str, description: str):
 
 def get_items(db: Session, skip: int = 0, limit: int = 10):
     return db.query(Item).offset(skip).limit(limit).all()
+
+
