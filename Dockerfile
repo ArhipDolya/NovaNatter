@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.10
 
 WORKDIR /app
 
@@ -6,11 +6,13 @@ COPY . .
 
 COPY requirements.txt .
 
-# Install build dependencies and PostgreSQL development libraries
-RUN apk --no-cache add --virtual .build-deps postgresql-dev gcc musl-dev \
+RUN apt-get update \
+    && apt-get install -y postgresql-server-dev-all gcc musl-dev \
     && pip install --upgrade pip \
     && pip install -r requirements.txt \
-    && apk del .build-deps  # Remove build dependencies after installation
+    && apt-get remove -y gcc musl-dev \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8000
 

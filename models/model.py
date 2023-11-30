@@ -1,16 +1,9 @@
-from sqlalchemy import Column, Integer, String
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
 from pydantic import BaseModel, Field, EmailStr
 
 from database import Base
-
-
-class User(Base):
-    __tablename__ = 'user'
-
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
 
 
 class Item(Base):

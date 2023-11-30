@@ -2,15 +2,17 @@ import uvicorn
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_users import FastAPIUsers
 
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
-from controllers import auth
-from schemas.UserSchema import UserSchema, UserLoginSchema
-from services.UserService import UserService
+from controllers import auth_controller
 
-from auth.jwt_handler import sign_JWT
+from auth.auth import auth_backend
+from auth.database import User
+from auth.manager import get_user_manager
+from auth.schemas import UserRead, UserCreate
 
 
 app = FastAPI(title='NovaNatter')
@@ -29,6 +31,25 @@ app.add_middleware(
 )
 
 
+fastapi_users = FastAPIUsers[User, int](
+    get_user_manager,
+    [auth_backend],
+)
+
+
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -37,27 +58,23 @@ def get_db():
         db.close()
 
 
+current_user = fastapi_users.current_user()
+
+
+@app.get("/protected-route")
+def protected_route(user: User = Depends(current_user)):
+    return f"Hello, {user.username}"
+
+
 @app.post('/create-item')
 async def create_item(name: str, description: str, db: Session = Depends(get_db)):
-    return auth.create_item(db, name=name, description=description)
+    return auth_controller.create_item(db, name=name, description=description)
 
 
 @app.get('/get_items')
-async def get_items(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return auth.get_items(db, skip=skip, limit=limit)
+async def get_items(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    return auth_controller.get_items(db, skip=skip, limit=limit)
 
-
-@app.post('/register', tags=['user'])
-async def register(user: UserSchema, db: Session = Depends(get_db)):
-    db_user = UserService.create_user(db, user)
-    token = sign_JWT(db_user.id)
-
-    return token
-
-
-@app.post('/login', tags=['user'])
-async def login_user(user: UserLoginSchema, db: Session = Depends(get_db)):
-    return UserService.login_user(db, user)
 
 
 if __name__ == '__main__':
