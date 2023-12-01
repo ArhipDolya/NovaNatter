@@ -6,11 +6,10 @@ from fastapi_users import FastAPIUsers
 
 from sqlalchemy.orm import Session
 
-from database import SessionLocal
+from database import SessionLocal, User
 from controllers import auth_controller
 
 from auth.auth import auth_backend
-from auth.database import User
 from auth.manager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 

@@ -1,9 +1,6 @@
-from fastapi import Depends
-from fastapi_users import fastapi_users
 from fastapi_users.authentication import CookieTransport, AuthenticationBackend
 from fastapi_users.authentication import JWTStrategy
 
-from auth.database import User
 
 cookie_transport = CookieTransport(cookie_name="NovaNatter", cookie_max_age=3600)
 
