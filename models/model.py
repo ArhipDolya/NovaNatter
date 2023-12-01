@@ -1,7 +1,4 @@
-from datetime import datetime
-
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
-from pydantic import BaseModel, Field, EmailStr
+from sqlalchemy import Column, Integer, String
 
 from database import Base
 

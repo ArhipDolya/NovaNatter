@@ -1,5 +1,4 @@
 from loguru import logger
-from asyncio import exceptions
 from typing import Optional
 
 from fastapi import Depends, Request
