@@ -9,6 +9,8 @@ from config import DB_HOST, DB_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWO
 
 from models import model
 from auth import models
+from chat import models as chat_models
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -31,7 +33,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [model.Base.metadata, models.Base.metadata]
+target_metadata = [model.Base.metadata, models.Base.metadata, chat_models.Base.metadata]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

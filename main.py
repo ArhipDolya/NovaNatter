@@ -8,6 +8,7 @@ from auth.schemas import UserRead, UserCreate
 from auth import router
 
 from routers import item_router
+from chat import router as chat_router
 
 
 app = FastAPI(title='NovaNatter')
@@ -39,6 +40,7 @@ app.include_router(
 )
 
 app.include_router(item_router.router, prefix='/items', tags=["items"])
+app.include_router(chat_router.router)
 
 
 if __name__ == '__main__':
