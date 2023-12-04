@@ -1,6 +1,8 @@
 import uvicorn
 
 from fastapi import FastAPI
+from fastapi_admin import admin
+from fastapi_admin.contrib.mongoengine import ModelAdmin
 from fastapi.middleware.cors import CORSMiddleware
 
 from auth.auth import auth_backend
@@ -15,7 +17,7 @@ app = FastAPI(title='NovaNatter')
 
 
 origins = [
-    "http://localhost:3000",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
@@ -25,6 +27,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(admin.get_admin_router())
+admin.register_model(ModelAdmin)
 
 
 app.include_router(
@@ -41,6 +47,7 @@ app.include_router(
 
 app.include_router(item_router.router, prefix='/items', tags=["items"])
 app.include_router(chat_router.router)
+app.include_router(router.router, prefix='/auth_router', tags=["auth_router"])
 
 
 if __name__ == '__main__':
