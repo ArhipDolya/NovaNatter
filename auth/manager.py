@@ -7,10 +7,12 @@ from fastapi_users import exceptions as user_exceptions
 
 from database import User, get_user_db
 
+from config import SECRET_KEY
+
 
 logger.add("logs.log", rotation="500 MB", level="INFO")
 
-SECRET = "fdlfdmkfdhbdjsoewoivjcmvxjcbhs2112fdsfsd"
+SECRET = SECRET_KEY
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):

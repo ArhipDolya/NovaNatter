@@ -1,8 +1,10 @@
 <template>
     <aside :class="`${isMenuOpen ? 'isMenuOpen' : ''}`">
-        <div class="logo">
-            <img src="../assets/chat.png" alt="NovaNatter">
-        </div>
+        <router-link to="/">
+            <div class="logo">
+                <img src="../assets/chat.png" alt="NovaNatter">
+            </div>
+        </router-link>
 
         <div class="menu-toggle-wrap">
             <button class="menu-toggle" @click="toggleMenu">

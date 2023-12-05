@@ -1,8 +1,6 @@
 import uvicorn
 
 from fastapi import FastAPI
-from fastapi_admin import admin
-from fastapi_admin.contrib.mongoengine import ModelAdmin
 from fastapi.middleware.cors import CORSMiddleware
 
 from auth.auth import auth_backend
@@ -27,10 +25,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-app.include_router(admin.get_admin_router())
-admin.register_model(ModelAdmin)
 
 
 app.include_router(

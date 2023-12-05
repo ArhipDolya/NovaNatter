@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-JWT_SECRET = config('SECRET_KEY')
-JWT_ALGORITHM = config('ALGORITHM')
+SECRET_KEY = config('SECRET_KEY')
 
 DB_HOST = os.environ.get('DB_HOST')
 DB_PORT = os.environ.get('DB_PORT')
