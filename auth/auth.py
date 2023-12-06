@@ -1,10 +1,13 @@
 from fastapi_users.authentication import CookieTransport, AuthenticationBackend
 from fastapi_users.authentication import JWTStrategy
 
+from config import SECRET_KEY
+
+
 
 cookie_transport = CookieTransport(cookie_name="NovaNatter", cookie_max_age=3600)
 
-SECRET = "dfsdlf213dlsfgfifdnek323xcvcvcsddsdsxnnmnm"
+SECRET = "fjskjdkfffffdsvnfdjbhsbdjsknfdvjfdsdnkfjdsjdjvjdsnjdjs"
 
 
 def get_jwt_strategy() -> JWTStrategy:

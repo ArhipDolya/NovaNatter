@@ -41,7 +41,7 @@ app.include_router(
 
 app.include_router(item_router.router, prefix='/items', tags=["items"])
 app.include_router(chat_router.router)
-app.include_router(router.router, prefix='/auth_router', tags=["auth_router"])
+app.include_router(router.router, prefix='/auth/user', tags=["user"])
 
 
 if __name__ == '__main__':
