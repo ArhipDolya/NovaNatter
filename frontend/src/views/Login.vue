@@ -28,17 +28,18 @@ const loginUser = async () => {
     const response = await fetch("http://localhost:8000/auth/jwt/login", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        username: email.value,
-        password: password.value,
-        grant_type: '',
-        scope: '',
-        client_id: '',
-        client_secret: '',
-      })
-    })
+          username: email.value,
+          password: password.value,
+          grant_type: '',
+          scope: '',
+          client_id: '',
+          client_secret: '',
+      }),
+      credentials: "include",
+    });
 
     if(!response.ok) {
       throw new Error('Login failed! Check your email and password.');
