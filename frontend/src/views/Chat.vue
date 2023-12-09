@@ -1,7 +1,7 @@
 <template>
   <div class="chat-container">
     <h1>WebSocket Chat</h1>
-    <h2>Your ID: <span>{{ clientId }}</span></h2>
+    <h2>Your ID: <span>{{ userId }}</span></h2>
     <form @submit.prevent="sendMessage" class="message-form">
       <input v-model="messageText" type="text" autocomplete="off" class="message-input" />
       <button type="submit" class="send-button">Send</button>
@@ -16,24 +16,31 @@
 export default {
   data() {
     return {
-      clientId: Date.now(),
+      userId: null,  // Initialize userId
       messageText: '',
       messages: [],
-      ws: new WebSocket(`ws://localhost:8000/chat/ws/${Date.now()}`),
+      ws: null,  // WebSocket instance
       refreshFlag: false // Add a flag to trigger refresh
     };
   },
   created() {
-    this.fetchLastMessages();
-    this.ws.onmessage = this.handleMessage;
-  },
-  watch: {
-    refreshFlag() {
-      // Watch for changes in refreshFlag and fetch messages
-      this.fetchLastMessages();
-    }
+    this.fetchUserInfo();
   },
   methods: {
+    async fetchUserInfo() {
+      const response = await fetch('http://localhost:8000/auth/user/me', {
+        method: 'GET',
+        credentials: 'include'  // Include cookies in the request
+      });
+      const userInfo = await response.json();
+      this.userId = userInfo.id;  // Set userId to the authenticated user's ID
+      this.initWebSocket();
+      this.fetchLastMessages();
+    },
+    initWebSocket() {
+      this.ws = new WebSocket(`ws://localhost:8000/chat/ws/${this.userId}`);
+      this.ws.onmessage = this.handleMessage;
+    },
     async fetchLastMessages() {
       const response = await fetch('http://localhost:8000/chat/last_messages', {
         method: 'GET'
@@ -45,9 +52,12 @@ export default {
       this.messages.push({ content: msg });
     },
     sendMessage() {
-      this.ws.send(this.messageText);
+      const messageData = {
+        user_id: this.userId,
+        message: this.messageText,
+      }
+      this.ws.send(JSON.stringify(messageData));
       this.messageText = '';
-
       // Toggle the refreshFlag to trigger a refresh
       this.refreshFlag = !this.refreshFlag;
     },

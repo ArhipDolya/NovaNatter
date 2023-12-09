@@ -1,44 +1,51 @@
+import json
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from auth.models import User
 
 from chat.models import Message
 from database import async_session_maker, get_async_session
 
+from dependencies.auth_dependency import current_user
+
 
 router = APIRouter(prefix="/chat", tags=['chat'])
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="templates")  
 
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: list[WebSocket] = []
+        self.active_connections: dict[str, WebSocket] = {}
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket, user_id: str):
         await websocket.accept()
-        self.active_connections.append(websocket)
+        self.active_connections[user_id] = websocket
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    def disconnect(self, websocket: WebSocket, user_id: str):
+        del self.active_connections[user_id]
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def send_personal_message(self, message: str, user_id: str):
+        if user_id in self.active_connections:
+            websocket = self.active_connections[user_id]
+            await websocket.send_text(message)
 
-    async def broadcast(self, message: str, add_to_database: bool):
+    async def broadcast(self, message: str, add_to_database: bool, user_id: str):
         if add_to_database:
-            await self.add_message_to_database(message)
+            await self.add_message_to_database(message, user_id)
         for connection in self.active_connections:
-            await connection.send_text(message)
+            websocket = self.active_connections[connection]
+            await websocket.send_text(message)
 
-    @staticmethod
-    async def add_message_to_database(message: str):
+    async def add_message_to_database(self, message: str, user_id: str):
         async with async_session_maker() as session:
-            statement = insert(Message).values(message=message)
-            await session.execute(statement)
-            await session.commit()
-
+            user = await session.get(User, user_id)
+            if user:
+                statement = insert(Message).values(message=message, user_id=user.id)
+                await session.execute(statement)
+                await session.commit()
 
 manager = ConnectionManager()
 
@@ -54,16 +61,20 @@ async def get_last_messages(session: AsyncSession = Depends(get_async_session)):
     return messages_list
 
 
-@router.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
-    await manager.connect(websocket)
+@router.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await manager.connect(websocket, user_id)
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(f"Client #{client_id}: {data}", add_to_database=True)
+            message_data = json.loads(data)
+            user_id = message_data.get('user_id', user_id)
+            message = message_data.get('message', '')
+
+            await manager.broadcast(f"User {user_id}: {message}", add_to_database=True, user_id=user_id)
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left the chat", add_to_database=False)
+        manager.disconnect(websocket, user_id)
+        await manager.broadcast(f"User {user_id} left the chat", add_to_database=False)
 
 
 @router.get('/')

@@ -1,9 +1,11 @@
 from datetime import datetime
+
 from sqlalchemy import Column, String, TIMESTAMP, Boolean, Integer
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 
-Base: DeclarativeMeta = declarative_base()
+Base = declarative_base()
 
 
 class User(Base):
@@ -17,3 +19,5 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=True)
     is_superuser = Column(Boolean, default=False, nullable=True)
     is_verified = Column(Boolean, default=False, nullable=True)
+
+    messages = relationship("Message", back_populates="user")
