@@ -9,6 +9,7 @@ from config import DB_HOST, DB_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWO
 
 from models import model
 from auth import models
+from chat import models as chat_model
 
 
 # this is the Alembic Config object, which provides

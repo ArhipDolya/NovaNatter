@@ -20,32 +20,31 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: dict[str, WebSocket] = {}
 
-    async def connect(self, websocket: WebSocket, user_id: str):
+    async def connect(self, websocket: WebSocket, username: str):
         await websocket.accept()
-        self.active_connections[user_id] = websocket
+        self.active_connections[username] = websocket
 
-    def disconnect(self, websocket: WebSocket, user_id: str):
-        del self.active_connections[user_id]
+    def disconnect(self, websocket: WebSocket, username: str):
+        del self.active_connections[username]
 
-    async def send_personal_message(self, message: str, user_id: str):
-        if user_id in self.active_connections:
-            websocket = self.active_connections[user_id]
+    async def send_personal_message(self, message: str, username: str):
+        if username in self.active_connections:
+            websocket = self.active_connections[username]
             await websocket.send_text(message)
 
-    async def broadcast(self, message: str, add_to_database: bool, user_id: str):
+    async def broadcast(self, message: str, add_to_database: bool, username: str):
         if add_to_database:
-            await self.add_message_to_database(message, user_id)
+            await self.add_message_to_database(message, username)
         for connection in self.active_connections:
             websocket = self.active_connections[connection]
             await websocket.send_text(message)
 
-    async def add_message_to_database(self, message: str, user_id: str):
+    async def add_message_to_database(self, message: str, username: str):
         async with async_session_maker() as session:
-            user = await session.get(User, user_id)
-            if user:
-                statement = insert(Message).values(message=message, user_id=user.id)
-                await session.execute(statement)
-                await session.commit()
+            statement = insert(Message).values(message=message, username=username)
+            await session.execute(statement)
+            await session.commit()
+                
 
 manager = ConnectionManager()
 
@@ -61,20 +60,20 @@ async def get_last_messages(session: AsyncSession = Depends(get_async_session)):
     return messages_list
 
 
-@router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
-    await manager.connect(websocket, user_id)
+@router.websocket("/ws/{username}")
+async def websocket_endpoint(websocket: WebSocket, username: str):
+    await manager.connect(websocket, username)
     try:
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
-            user_id = message_data.get('user_id', user_id)
+            message_username = message_data.get('username', username)
             message = message_data.get('message', '')
 
-            await manager.broadcast(f"User {user_id}: {message}", add_to_database=True, user_id=user_id)
+            await manager.broadcast(f"User {message_username}: {message}", add_to_database=True, username=message_username)
     except WebSocketDisconnect:
-        manager.disconnect(websocket, user_id)
-        await manager.broadcast(f"User {user_id} left the chat", add_to_database=False)
+        manager.disconnect(websocket, username)
+        await manager.broadcast(f"User {username} left the chat", add_to_database=False)
 
 
 @router.get('/')

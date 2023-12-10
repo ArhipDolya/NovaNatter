@@ -1,7 +1,7 @@
 <template>
   <div class="chat-container">
     <h1>WebSocket Chat</h1>
-    <h2>Your ID: <span>{{ userId }}</span></h2>
+    <h2>Your name: <span>{{ username }}</span></h2>
     <form @submit.prevent="sendMessage" class="message-form">
       <input v-model="messageText" type="text" autocomplete="off" class="message-input" />
       <button type="submit" class="send-button">Send</button>
@@ -16,11 +16,10 @@
 export default {
   data() {
     return {
-      userId: null,  // Initialize userId
+      username: null,
       messageText: '',
       messages: [],
-      ws: null,  // WebSocket instance
-      refreshFlag: false // Add a flag to trigger refresh
+      ws: null,
     };
   },
   created() {
@@ -30,15 +29,18 @@ export default {
     async fetchUserInfo() {
       const response = await fetch('http://localhost:8000/auth/user/me', {
         method: 'GET',
-        credentials: 'include'  // Include cookies in the request
+        credentials: 'include'
       });
       const userInfo = await response.json();
-      this.userId = userInfo.id;  // Set userId to the authenticated user's ID
-      this.initWebSocket();
-      this.fetchLastMessages();
+      this.username = userInfo.username;
+
+      if (this.username) {
+        this.initWebSocket();
+        this.fetchLastMessages();
+      }
     },
     initWebSocket() {
-      this.ws = new WebSocket(`ws://localhost:8000/chat/ws/${this.userId}`);
+      this.ws = new WebSocket(`ws://localhost:8000/chat/ws/${this.username}`);
       this.ws.onmessage = this.handleMessage;
     },
     async fetchLastMessages() {
@@ -53,18 +55,20 @@ export default {
     },
     sendMessage() {
       const messageData = {
-        user_id: this.userId,
+        username: this.username,
         message: this.messageText,
-      }
+      };
       this.ws.send(JSON.stringify(messageData));
+    
+      // Update messages directly instead of reloading the page
+      this.appendMessage(this.messageText);
       this.messageText = '';
-      // Toggle the refreshFlag to trigger a refresh
-      this.refreshFlag = !this.refreshFlag;
+
+      // Reload the page after 1000 milliseconds (1 second)
+      setTimeout(() => {
+        location.reload();
+      }, 500);
     },
-    handleMessage(event) {
-      console.log("Received message:", event.data);
-      this.appendMessage(event.data);
-    }
   }
 };
 </script>

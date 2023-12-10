@@ -1,8 +1,8 @@
-"""Add relations to Message and User models
+"""add relationship message and user
 
-Revision ID: c7a967488d3e
-Revises: 9033490c59bd
-Create Date: 2023-12-09 13:19:24.579613
+Revision ID: 314818f7614a
+Revises: c98e684a2dde
+Create Date: 2023-12-10 08:42:54.374658
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c7a967488d3e'
-down_revision: Union[str, None] = '9033490c59bd'
+revision: str = '314818f7614a'
+down_revision: Union[str, None] = 'c98e684a2dde'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
