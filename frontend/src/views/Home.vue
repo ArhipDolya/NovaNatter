@@ -8,12 +8,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { API_BASE_URL } from '../config'
 
 const isLoggedIn = ref(false);
 
 const checkAuthentication = async () => {
   try {
-    const response = await fetch('http://localhost:8000/auth/user/status', {
+    const response = await fetch(`${API_BASE_URL}/auth/user/status`, {
       method: "GET",
       credentials: "include",
     })

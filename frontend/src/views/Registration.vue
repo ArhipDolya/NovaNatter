@@ -19,6 +19,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { API_BASE_URL } from '../config'
 
 const username = ref('');
 const email = ref('');
@@ -26,7 +27,7 @@ const password = ref('');
 
 const registerUser = async () => {
   try {
-    const response = await fetch("http://localhost:8000/auth/register", {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

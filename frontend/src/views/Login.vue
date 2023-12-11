@@ -19,13 +19,14 @@
   
 <script setup>
 import { ref } from 'vue'
+import { API_BASE_URL } from '../config'
 
 const email = ref('')
 const password = ref('')
 
 const loginUser = async () => {
   try {
-    const response = await fetch("http://localhost:8000/auth/jwt/login", {
+    const response = await fetch(`${API_BASE_URL}/auth/jwt/login`, {
       method: "POST",
       headers: {
           "Content-Type": "application/x-www-form-urlencoded",
