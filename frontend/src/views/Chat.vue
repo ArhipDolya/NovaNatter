@@ -7,14 +7,12 @@
       <button type="submit" class="send-button">Send</button>
     </form>
     <ul class="message-list">
-      <li v-for="(message, index) in messages" :key="index" class="message">{{ message.content }}</li>
+      <li v-for="(message, index) in messages" :key="index" class="message">{{ message.message }}</li>
     </ul>
   </div>
 </template>
 
 <script>
-import { API_BASE_URL } from '../config'
-
 export default {
   data() {
     return {
@@ -29,35 +27,28 @@ export default {
   },
   methods: {
     async fetchUserInfo() {
-      try {
-        const response = await fetch(`${API_BASE_URL}/auth/user/me`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-        const userInfo = await response.json();
-        this.username = userInfo.username;
+      const response = await fetch('http://localhost:8000/auth/user/me', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const userInfo = await response.json();
+      this.username = userInfo.username;
 
-        if (this.username) {
-          this.initWebSocket();
-          this.fetchLastMessages();
-        }
-      } catch (error) {
-        console.error('Error fetching user info:', error);
+      if (this.username) {
+        this.initWebSocket();
+        this.fetchLastMessages();
       }
     },
-    async initWebSocket() {
+    initWebSocket() {
       this.ws = new WebSocket(`ws://localhost:8000/chat/ws/${this.username}`);
       this.ws.onmessage = this.handleMessage;
     },
     async fetchLastMessages() {
-      try {
-        const response = await fetch(`${API_BASE_URL}/chat/last_messages`, {
-          method: 'GET'
-        });
-        this.messages = await response.json();
-      } catch (error) {
-        console.error('Error fetching last messages:', error);
-      }
+      const response = await fetch('http://localhost:8000/chat/last_messages', {
+        method: 'GET'
+      });
+      const messages = await response.json();
+      this.messages = messages;
     },
     appendMessage(msg) {
       this.messages.push({ content: msg });
@@ -72,6 +63,11 @@ export default {
       // Update messages directly instead of reloading the page
       this.appendMessage(this.messageText);
       this.messageText = '';
+
+      // Reload the page after 1000 milliseconds (1 second)
+      setTimeout(() => {
+        location.reload();
+      }, 500);
     },
   }
 };
