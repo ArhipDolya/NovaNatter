@@ -21,6 +21,7 @@
 import { ref } from 'vue';
 import { API_BASE_URL } from '../config'
 
+
 const username = ref('');
 const email = ref('');
 const password = ref('');

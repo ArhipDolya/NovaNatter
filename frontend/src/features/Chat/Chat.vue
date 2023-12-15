@@ -13,6 +13,11 @@
 </template>
 
 <script>
+
+import { useRouter } from 'vue-router'
+import { API_BASE_URL } from '../config';
+
+
 export default {
   data() {
     return {
@@ -27,16 +32,27 @@ export default {
   },
   methods: {
     async fetchUserInfo() {
-      const response = await fetch('http://localhost:8000/auth/user/me', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      const userInfo = await response.json();
-      this.username = userInfo.username;
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/user/me`, {
+          method: 'GET',
+          credentials: 'include'
+        });
 
-      if (this.username) {
-        this.initWebSocket();
-        this.fetchLastMessages();
+        if (!response.ok) {
+          // User is not logged in, redirect to login page
+          document.location.href = '/login'
+          return;
+        }
+
+        const userInfo = await response.json();
+        this.username = userInfo.username;
+
+        if (this.username) {
+          this.initWebSocket();
+          this.fetchLastMessages();
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
       }
     },
     initWebSocket() {
@@ -132,5 +148,4 @@ h2 span {
   margin-bottom: 8px;
 }
 
-/* Add additional styles as needed */
 </style>
