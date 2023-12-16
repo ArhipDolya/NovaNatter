@@ -1,20 +1,26 @@
 <template>
   <div class="chat-container">
-    <h1>WebSocket Chat</h1>
-    <h2>Your name: <span>{{ username }}</span></h2>
+    <h1>NovaNatter Chat</h1>
+    <h2>Your username: <span>{{ username }}</span></h2>
     <form @submit.prevent="sendMessage" class="message-form">
       <input v-model="messageText" type="text" autocomplete="off" class="message-input" />
       <button type="submit" class="send-button">Send</button>
     </form>
     <ul class="message-list">
-      <li v-for="(message, index) in messages" :key="index" class="message">{{ message.message }}</li>
+      <li v-for="(message, index) in messages" :key="index" class="message">
+        <div class="user-info">
+          <router-link to="/profile">
+            <img src="\src\assets\user-avatar.png" alt="User Avatar" class="user-avatar" />
+          </router-link>
+          <div class="message-content">{{ message.message }}</div>
+        </div>
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
 
-import { useRouter } from 'vue-router'
 import { API_BASE_URL } from '../config';
 
 
@@ -91,9 +97,9 @@ export default {
 
 <style scoped>
 .chat-container {
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
-  padding: 20px;
+  padding: 50px;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -105,7 +111,7 @@ h1, h2 {
 
 h2 span {
   font-weight: bold;
-  color: #007BFF; /* Blue color for the client ID */
+  color: #007BFF;
 }
 
 .message-form {
@@ -122,7 +128,7 @@ h2 span {
 }
 
 .send-button {
-  background-color: #28A745; /* Green color for the send button */
+  background-color: #28A745;
   color: #fff;
   border: none;
   padding: 8px 12px;
@@ -131,7 +137,7 @@ h2 span {
 }
 
 .send-button:hover {
-  background-color: #218838; /* Darker green on hover */
+  background-color: #218838;
 }
 
 .message-list {
@@ -146,6 +152,27 @@ h2 span {
   border-radius: 4px;
   padding: 8px;
   margin-bottom: 8px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 55px; 
+  height: 35px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.message-content {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 8px;
+  flex: 1; 
 }
 
 </style>

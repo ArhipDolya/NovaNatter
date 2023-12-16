@@ -4,6 +4,7 @@ import Home from '../features/Home/Home.vue'
 import Login from '../features/Login/Login.vue'
 import Registration from '../features/Registration/Registration.vue'
 import Chat from '../features/Chat/Chat.vue'
+import Profile from '../features/Profile/Profile.vue'
 
 
 const router = createRouter({
@@ -25,6 +26,10 @@ const router = createRouter({
             path: '/chat',
             component: Chat,
         },
+        {
+            path: '/profile',
+            component: Profile
+        }
     ]
 })
 
