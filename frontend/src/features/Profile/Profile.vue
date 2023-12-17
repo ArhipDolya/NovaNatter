@@ -1,40 +1,47 @@
 <template>
-    <div class="profile-container">
-      <h1>Profile</h1>
-      <div v-if="username" class="username-info">
-        <img src="\src\assets\user-avatar.png" alt="User Avatar" class="user-avatar" />
-        <span class="username-text">Username: {{ username }}</span>
-      </div>
-      <div v-else>Loading...</div>
+  <div class="profile-container">
+    <h1>Profile</h1>
+    <div v-if="username" class="username-info">
+      <img src="\src\assets\user-avatar.png" alt="User Avatar" class="user-avatar" />
+      <span class="username-text">Username: {{ username }}</span>
     </div>
+
+  </div>
 </template>
   
-<script setup>
-
+<script lang="ts">
 import { ref, onMounted } from 'vue';
 import { API_BASE_URL } from '../config';
+import axios from 'axios'
 
-const username = ref('');
+export default {
+  setup() {
+    const username = ref<string | null>('');
 
-const getUserInfo = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/user/me`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+    const getUserInfo = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/auth/user/me`, {
+          credentials: 'include',
+        });
 
-    if (response.ok) {
-      const userInfo = await response.json();
-      username.value = userInfo.username;
-    } else {
-      console.error('Failed to fetch user info');
-    }
-  } catch (error) {
-    console.error('Error during fetch:', error.message);
-  }
+        if (response.ok) {
+          const userInfo = await response.json();
+          username.value = userInfo.username;
+        } else {
+          console.error('Failed to fetch user info');
+        }
+      } catch (error) {
+        console.error('Error during fetch:', error.message);
+      }
+    };
+
+    onMounted(getUserInfo);
+
+    return {
+      username,
+    };
+  },
 };
-  
-onMounted(getUserInfo);
 </script>
   
 <style scoped>

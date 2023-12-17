@@ -9,28 +9,36 @@
     <ul class="message-list">
       <li v-for="(message, index) in messages" :key="index" class="message">
         <div class="user-info">
-          <router-link to="/profile">
-            <img src="\src\assets\user-avatar.png" alt="User Avatar" class="user-avatar" />
-          </router-link>
-          <div class="message-content">{{ message.message }}</div>
+          <UserAvatar />
+          <MessageContent :message="message.message" />
         </div>
       </li>
     </ul>
   </div>
 </template>
 
-<script>
-
+<script lang="ts">
+import { defineComponent } from 'vue';
+import UserAvatar from './UserAvatar.vue';
+import MessageContent from './MessageContent.vue';
 import { API_BASE_URL } from '../config';
+import axios from 'axios'
 
+interface Message {
+  message: string;
+}
 
-export default {
+export default defineComponent({
+  components: {
+    UserAvatar,
+    MessageContent,
+  },
   data() {
     return {
-      username: null,
+      username: null as string | null,
       messageText: '',
-      messages: [],
-      ws: null,
+      messages: [] as Message[],
+      ws: null as WebSocket | null,
     };
   },
   created() {
@@ -39,14 +47,12 @@ export default {
   methods: {
     async fetchUserInfo() {
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/user/me`, {
-          method: 'GET',
-          credentials: 'include'
+        const response = await axios.get(`${API_BASE_URL}/auth/user/me`, {
+          withCredentials: 'include',
         });
 
         if (!response.ok) {
-          // User is not logged in, redirect to login page
-          document.location.href = '/login'
+          document.location.href = '/login';
           return;
         }
 
@@ -66,33 +72,35 @@ export default {
       this.ws.onmessage = this.handleMessage;
     },
     async fetchLastMessages() {
-      const response = await fetch('http://localhost:8000/chat/last_messages', {
-        method: 'GET'
-      });
+      const response = await axios.get('http://localhost:8000/chat/last_messages');
       const messages = await response.json();
       this.messages = messages;
     },
-    appendMessage(msg) {
-      this.messages.push({ content: msg });
+    appendMessage(msg: string) {
+      this.messages.push({ message: msg });
     },
     sendMessage() {
-      const messageData = {
-        username: this.username,
-        message: this.messageText,
-      };
-      this.ws.send(JSON.stringify(messageData));
-    
-      // Update messages directly instead of reloading the page
+      if (this.ws) {
+        const messageData = {
+          username: this.username,
+          message: this.messageText,
+        };
+        this.ws.send(JSON.stringify(messageData));
+      }
+
       this.appendMessage(this.messageText);
       this.messageText = '';
 
-      // Reload the page after 1000 milliseconds (1 second)
       setTimeout(() => {
         location.reload();
       }, 500);
     },
-  }
-};
+    handleMessage(event: MessageEvent) {
+      const message = JSON.parse(event.data);
+      this.appendMessage(message.message);
+    },
+  },
+});
 </script>
 
 <style scoped>
@@ -158,21 +166,4 @@ h2 span {
   display: flex;
   align-items: center;
 }
-
-.user-avatar {
-  width: 55px; 
-  height: 35px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.message-content {
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 20px;
-  margin-bottom: 8px;
-  flex: 1; 
-}
-
 </style>

@@ -17,27 +17,22 @@
   </main>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL } from '../config';
+import axios from 'axios'
 
 
-const username = ref('');
-const email = ref('');
-const password = ref('');
+const username = ref<string>('');
+const email = ref<string>('');
+const password = ref<string>('');
 
 const registerUser = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username.value,
-        email: email.value,
-        password: password.value,
-      })
+    const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+      username: username.value,
+      email: email.value,
+      password: password.value,
     });
 
     if (!response.ok) {

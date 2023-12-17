@@ -1,6 +1,5 @@
 <template>
   <main class="login-page">
-    
     <h1 class="text">Login</h1>
 
     <form @submit.prevent="loginUser" class="login-form">
@@ -12,17 +11,16 @@
 
       <button type="submit">Login</button>
     </form>
-
   </main>
 </template>
 
   
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { API_BASE_URL } from '../config'
 
-const email = ref('')
-const password = ref('')
+const email = ref<string>('')
+const password = ref<string>('')
 
 const loginUser = async () => {
   try {
@@ -41,17 +39,15 @@ const loginUser = async () => {
       }),
       credentials: "include",
     });
-
-    if(!response.ok) {
+    if (!response.ok) {
       throw new Error('Login failed! Check your email and password.');
     }
 
-    window.location.href = "/chat"
+    window.location.href = '/chat';
   } catch (error) {
     console.error('Error during login:', error.message);
   }
-}
-
+};
 </script>
 
 <style scoped>
