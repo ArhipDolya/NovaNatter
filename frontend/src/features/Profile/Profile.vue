@@ -20,7 +20,7 @@ export default {
 
     const getUserInfo = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/auth/user/me`, {
+        const response = await fetch(`${API_BASE_URL}/auth/user/me`, {
           credentials: 'include',
         });
 

@@ -29,10 +29,16 @@ const password = ref<string>('');
 
 const registerUser = async () => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/register`, {
-      username: username.value,
-      email: email.value,
-      password: password.value,
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      })
     });
 
     if (!response.ok) {

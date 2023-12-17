@@ -47,8 +47,9 @@ export default defineComponent({
   methods: {
     async fetchUserInfo() {
       try {
-        const response = await axios.get(`${API_BASE_URL}/auth/user/me`, {
-          withCredentials: 'include',
+        const response = await fetch(`${API_BASE_URL}/auth/user/me`, {
+          method: 'GET',
+          credentials: 'include'
         });
 
         if (!response.ok) {
@@ -72,7 +73,7 @@ export default defineComponent({
       this.ws.onmessage = this.handleMessage;
     },
     async fetchLastMessages() {
-      const response = await axios.get('http://localhost:8000/chat/last_messages');
+      const response = await fetch('http://localhost:8000/chat/last_messages');
       const messages = await response.json();
       this.messages = messages;
     },
