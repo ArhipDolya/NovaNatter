@@ -9,10 +9,12 @@ services:
       - .:/app
     depends_on:
       - db
+      - rabbitmq
     environment:
       - DATABASE_URL=postgresql://dbuser:pass@db:5432/dbname
     command: >
       sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload --workers 2"
+    
 
   db:
     image: postgres:latest
@@ -32,6 +34,41 @@ services:
       - "5050:80"
     depends_on:
       - db
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+  
+  celery:
+    build: .
+    command: celery -A celery_config.app worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq
+      - db
+      - app
+    environment:
+      - C_FORCE_ROOT=true
+  
+  flower:
+    build: 
+      context: .
+    hostname: flower
+    entrypoint: celery
+    command: -A celery_config.app flower
+    volumes:
+      - .:/app
+    depends_on:
+      - celery
+      - rabbitmq
+    ports:
+      - "5555:5555"
 
 volumes:
   postgres_data:

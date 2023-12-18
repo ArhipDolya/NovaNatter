@@ -6,6 +6,7 @@ from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
 from fastapi_users import exceptions as user_exceptions
 
 from database import User, get_user_db
+from .tasks import send_registration_email
 
 from config import SECRET_KEY
 
@@ -21,6 +22,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         logger.info(f"User {user.id} has registered.")
+        send_registration_email.delay(user.email)
 
     async def create(
         self,

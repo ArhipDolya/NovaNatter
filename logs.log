@@ -3,3 +3,6 @@
 2023-12-04 17:54:18.616 | INFO     | auth.manager:on_after_register:23 - User 2 has registered.
 2023-12-05 17:21:23.159 | INFO     | auth.manager:on_after_register:23 - User 3 has registered.
 2023-12-10 08:45:03.720 | INFO     | auth.manager:on_after_register:23 - User 1 has registered.
+2023-12-18 08:32:26.891 | INFO     | auth.manager:on_after_register:24 - User 3 has registered.
+2023-12-18 08:35:55.959 | INFO     | auth.manager:on_after_register:24 - User 4 has registered.
+2023-12-18 08:39:09.186 | INFO     | auth.manager:on_after_register:24 - User 5 has registered.

@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends
 from database import User
 from dependencies.auth_dependency import current_user, fastapi_users
 
-
 router = APIRouter()
 
 

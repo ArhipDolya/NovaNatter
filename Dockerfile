@@ -14,6 +14,8 @@ RUN apt-get update \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip install flower
+
 EXPOSE 8000
 
-CMD ["sh", "-c", "find . -name '*.py' | entr -r uvicorn main:app --host 0.0.0.0 --port 8000 --reload --workers 2"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload --workers 2"]
