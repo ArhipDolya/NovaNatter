@@ -1,3 +1,5 @@
+import re
+
 from loguru import logger
 from typing import Optional
 
@@ -31,6 +33,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         request: Optional[Request] = None,
     ) -> models.UP:
 
+        if not self.is_valid_email(user_create.email):
+            raise user_exceptions.UserAlreadyExists()
+        
         await self.validate_password(user_create.password, user_create)
 
         existing_user = await self.user_db.get_by_email(user_create.email)
@@ -50,7 +55,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         await self.on_after_register(created_user, request)
 
         return created_user
+    
+    @staticmethod
+    def is_valid_email(email: str) -> bool:
+        email_pattern = re.compile(r"[^@]+@[^@]+\.[^@]+")
+        return bool(re.match(email_pattern, email))
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
+
+

@@ -9,18 +9,23 @@
       <label for="password">Password:</label>
       <input type="password" id="password" v-model="password" required>
 
+      <div class="remember-me">
+        <label for="rememberMe">Remember me:</label>  
+        <input type="checkbox" id="rememberMe" v-model="rememberMe">
+      </div>
+
       <button type="submit">Login</button>
     </form>
   </main>
 </template>
 
-  
 <script setup lang="ts">
 import { ref } from 'vue'
 import { API_BASE_URL } from '../config'
 
 const email = ref<string>('')
 const password = ref<string>('')
+const rememberMe = ref<boolean>(false)
 
 const loginUser = async () => {
   try {
@@ -36,6 +41,7 @@ const loginUser = async () => {
           scope: '',
           client_id: '',
           client_secret: '',
+          rememberMe: rememberMe.value.toString(),
       }),
       credentials: "include",
     });
@@ -51,7 +57,6 @@ const loginUser = async () => {
 </script>
 
 <style scoped>
-
 .text {
   padding: 10px;
 }
@@ -86,6 +91,16 @@ input {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.remember-me input {
+  margin-right: 200px;
 }
 
 button {
