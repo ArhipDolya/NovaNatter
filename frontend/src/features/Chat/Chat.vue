@@ -9,7 +9,7 @@
     <ul class="message-list">
       <li v-for="(message, index) in messages" :key="index" class="message">
         <div class="user-info">
-          <UserAvatar />
+          <UserAvatar :profileImage="userImage"/>
           <MessageContent :message="message.message" />
         </div>
       </li>
