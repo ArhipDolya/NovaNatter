@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, TIMESTAMP, Boolean, Integer, UniqueConstraint
+from sqlalchemy import Column, String, TIMESTAMP, Boolean, Integer, UniqueConstraint, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -19,6 +19,7 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=True)
     is_superuser = Column(Boolean, default=False, nullable=True)
     is_verified = Column(Boolean, default=False, nullable=True)
+    profile_image = Column(String, nullable=True)
 
     messages = relationship("Message", back_populates="user")
 

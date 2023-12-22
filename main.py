@@ -1,3 +1,4 @@
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 from fastapi import FastAPI
@@ -44,6 +45,8 @@ app.include_router(item_router.router, prefix='/items', tags=["items"])
 app.include_router(chat_router.router)
 app.include_router(router.router, prefix='/auth/user', tags=["user"])
 
+
+app.mount("/images", StaticFiles(directory='images'), name='images')
 
 
 if __name__ == '__main__':
